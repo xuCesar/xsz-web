@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const writing = (await getCollection('writing', ({ data }) => data.status === 'published')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const typeLabel = { technical: '技术', life: '随笔', opinion: '观点', note: '笔记' } as const;
+const formatDate = (date: Date) => date.toISOString().slice(0, 10).replaceAll('-', '.');
+const contentSlug = (id: string) => id.replace(/\/index$/, '');
+---
+
+<BaseLayout title="文章" description="xsz 的技术文章、生活随笔与个人观点。">
+	<section class="page-intro">
+		<h1 class="page-heading">文章</h1>
+		<p>技术实践、生活随笔和个人观点，按时间慢慢留下来。</p>
+	</section>
+	<section class="section" aria-label="文章列表">
+		<div class="writing-list">
+			{writing.map((entry) => (
+				<a class="writing-row" href={`/writing/${contentSlug(entry.id)}`}>
+					<div class="writing-meta"><div>{formatDate(entry.data.date)}</div><div class="writing-type">{typeLabel[entry.data.type]}</div></div>
+					<div><div class="writing-title">{entry.data.title}</div><p class="project-summary">{entry.data.summary}</p></div>
+				</a>
+			))}
+		</div>
+	</section>
+</BaseLayout>

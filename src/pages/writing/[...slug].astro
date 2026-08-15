@@ -1,0 +1,23 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+	const writing = await getCollection('writing', ({ data }) => data.status === 'published');
+	return writing.map((entry) => ({ params: { slug: entry.id.replace(/\/index$/, '') }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const typeLabel = { technical: '技术', life: '随笔', opinion: '观点', note: '笔记' } as const;
+const formatDate = (date: Date) => date.toISOString().slice(0, 10).replaceAll('-', '.');
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.summary}>
+	<article class="page-intro">
+		<p class="eyebrow">{typeLabel[entry.data.type]} · {formatDate(entry.data.date)}</p>
+		<h1 class="page-heading">{entry.data.title}</h1>
+		<p>{entry.data.summary}</p>
+	</article>
+	<article class="prose"><Content /></article>
+</BaseLayout>

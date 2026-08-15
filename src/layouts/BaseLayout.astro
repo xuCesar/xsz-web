@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = 'xsz 的个人作品与长期写作空间。' } = Astro.props;
+const navigation = [
+	{ href: '/', label: '首页' },
+					{ href: '/projects', label: '作品' },
+					{ href: '/writing', label: '文章' },
+					{ href: '/now', label: '现在' },
+					{ href: '/about', label: '关于' },
+];
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content={description} />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title} · xsz</title>
+	</head>
+	<body>
+		<div class="site-shell">
+			<header class="site-header">
+				<a class="wordmark" href="/" aria-label="返回首页">xsz</a>
+				<nav aria-label="主导航">
+					{navigation.map((item) => (
+						<a class:list={{ active: currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href)) }} href={item.href}>
+							{item.label}
+						</a>
+					))}
+				</nav>
+			</header>
+
+			<main>
+				<slot />
+			</main>
+
+			<footer class="site-footer">
+				<div>
+					<p class="footer-mark">xsz</p>
+					<p class="footer-note">在技术、生活与思考之间，持续记录。</p>
+				</div>
+				<div class="footer-links">
+					<a href="/writing">文章</a>
+					<a href="/now">现在</a>
+				</div>
+				<p class="footer-copy">© 2026 xsz</p>
+			</footer>
+		</div>
+	</body>
+</html>
