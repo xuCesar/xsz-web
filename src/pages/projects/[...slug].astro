@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
 
 export async function getStaticPaths() {
 	const projects = await getCollection('projects', ({ data }) => data.status === 'published');
@@ -8,14 +9,31 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
+const hasToc = headings.some((heading) => heading.depth >= 2 && heading.depth <= 3);
+const statusLabel = { active: '持续开发', paused: '暂停维护', shipped: '已发布' } as const;
+const formatDate = (date: Date) => date.toISOString().slice(0, 7).replace('-', '.');
 ---
 
 <BaseLayout title={project.data.title} description={project.data.summary}>
 	<article class="page-intro">
-		<p class="eyebrow">项目 · {project.data.projectStatus}</p>
+		<p class="eyebrow">项目 · {statusLabel[project.data.projectStatus]}</p>
 		<h1 class="page-heading">{project.data.title}</h1>
 		<p>{project.data.summary}</p>
+		<dl class="project-facts">
+			<div><dt>角色</dt><dd>{project.data.role}</dd></div>
+			<div><dt>技术</dt><dd>{project.data.tech.join(' · ')}</dd></div>
+			<div><dt>时间</dt><dd>{formatDate(project.data.date)}{project.data.updated && ` — ${formatDate(project.data.updated)}`}</dd></div>
+		</dl>
+		{(project.data.liveUrl || project.data.repoUrl) && (
+			<div class="project-actions">
+				{project.data.liveUrl && <a href={project.data.liveUrl} target="_blank" rel="noreferrer">访问项目 <span aria-hidden="true">↗</span></a>}
+				{project.data.repoUrl && <a href={project.data.repoUrl} target="_blank" rel="noreferrer">查看源码 <span aria-hidden="true">↗</span></a>}
+			</div>
+		)}
 	</article>
-	<article class="prose"><Content /></article>
+	<div class:list={{ 'detail-layout': hasToc }}>
+		{hasToc && <TableOfContents headings={headings} />}
+		<article class="prose"><Content /></article>
+	</div>
 </BaseLayout>

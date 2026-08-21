@@ -14,6 +14,7 @@ const latestWriting = writing.sort((a, b) => b.data.date.valueOf() - a.data.date
 const heroProject = featuredProjects[0];
 const formatDate = (date: Date) => date.toISOString().slice(0, 10).replaceAll('-', '.');
 const typeLabel = { technical: '技术', life: '随笔', opinion: '观点', note: '笔记' } as const;
+const statusLabel = { active: '持续开发', paused: '暂停维护', shipped: '已发布' } as const;
 const contentSlug = (id: string) => id.replace(/\/index$/, '');
 ---
 
@@ -21,10 +22,10 @@ const contentSlug = (id: string) => id.replace(/\/index$/, '');
 	<section class="hero">
 		<div>
 			<h1>把做过的事写下来，把还在思考的问题留在这里。</h1>
-			<p class="hero-copy">这是 xsz 的个人空间：记录项目如何被做出来，也记录技术之外那些值得慢慢想清楚的事。</p>
+			<p class="hero-copy">这是 xsz 的个人空间：以前端工程为起点，记录复杂业务系统、独立产品与全栈实践如何被做出来，也记录技术之外那些值得慢慢想清楚的事。</p>
 			<div class="hero-actions">
 				<a class="text-link" href="/writing">阅读文章 <span class="arrow" aria-hidden="true">→</span></a>
-				<a class="text-link" href="/projects">查看作品 <span class="arrow" aria-hidden="true">→</span></a>
+				<a class="text-link" href="/projects">查看项目 <span class="arrow" aria-hidden="true">→</span></a>
 			</div>
 		</div>
 		{heroProject?.data.cover && (
@@ -35,7 +36,7 @@ const contentSlug = (id: string) => id.replace(/\/index$/, '');
 	</section>
 
 	<section class="section" aria-labelledby="projects-heading">
-		<h2 class="section-heading" id="projects-heading">精选作品</h2>
+		<h2 class="section-heading" id="projects-heading">精选项目</h2>
 		<hr class="section-rule" />
 		<div class="project-grid">
 			{featuredProjects.map((project) => (
@@ -43,13 +44,14 @@ const contentSlug = (id: string) => id.replace(/\/index$/, '');
 					<div class="project-media">
 						{project.data.cover && <Image src={project.data.cover} alt={project.data.coverAlt ?? project.data.title} sizes="(max-width: 800px) 100vw, 33vw" />}
 					</div>
+					<p class="project-context">{project.data.role} · {statusLabel[project.data.projectStatus]}</p>
 					<h3 class="project-title">{project.data.title}</h3>
 					<p class="project-summary">{project.data.summary}</p>
 					<p class="project-meta">{project.data.tech.join(' · ')}</p>
 				</a>
 			))}
 		</div>
-		<a class="text-link section-link" href="/projects">查看全部作品 <span class="arrow" aria-hidden="true">→</span></a>
+		<a class="text-link section-link" href="/projects">查看全部项目 <span class="arrow" aria-hidden="true">→</span></a>
 	</section>
 
 	<section class="section" aria-labelledby="writing-heading">

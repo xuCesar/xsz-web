@@ -3,8 +3,8 @@ title: "实验项目"
 summary: "对交互、排版与新技术的持续探索。"
 date: 2026-07-26
 updated: 2026-07-26
-status: published
-featured: true
+status: draft
+featured: false
 tags: [Web, Exploration]
 role: "持续实验"
 tech: [Web, Interaction]
@@ -23,4 +23,4 @@ coverAlt: "斜向阳光切过白色墙面的极简建筑抽象图"
 
 我会尽量给每次实验留下一个可观察的结果：截图、短笔记或一个可以运行的版本。如果它确实解决了问题，就把它带回正式项目；如果没有，就记录原因并停在这里。停下来也是实验结果的一部分。
 
-这个项目会持续更新，状态保持为 active，直到其中某个方向被整理成更具体的作品。
+这个项目会持续更新，状态保持为 active，直到其中某个方向被整理成更具体的项目。

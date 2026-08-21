@@ -3,8 +3,8 @@ title: "内容系统"
 summary: "围绕 Markdown 构建的可维护内容工作流。"
 date: 2026-08-08
 updated: 2026-08-08
-status: published
-featured: true
+status: draft
+featured: false
 tags: [Content, Tooling]
 role: "系统设计"
 tech: [Markdown, Zod, Astro]

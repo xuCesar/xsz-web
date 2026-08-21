@@ -7,18 +7,20 @@ const projects = await getCollection('projects', ({ data }) => data.status === '
 const updatedValue = (date: Date | undefined, fallback: Date) => date?.valueOf() ?? fallback.valueOf();
 projects.sort((a, b) => updatedValue(b.data.updated, b.data.date) - updatedValue(a.data.updated, a.data.date));
 const contentSlug = (id: string) => id.replace(/\/index$/, '');
+const statusLabel = { active: '持续开发', paused: '暂停维护', shipped: '已发布' } as const;
 ---
 
-<BaseLayout title="作品" description="xsz 的项目与实践。">
+<BaseLayout title="项目" description="xsz 的项目与实践。">
 	<section class="page-intro">
-		<h1 class="page-heading">作品</h1>
-		<p>记录做过的项目，也记录项目背后的判断、取舍和过程。</p>
+		<h1 class="page-heading">项目</h1>
+		<p>这里不只陈列完成的界面，也记录项目从真实问题出发，如何处理业务约束、数据边界与工程取舍，以及它目前真正走到了哪里。</p>
 	</section>
 	<section class="section" aria-label="项目列表">
 		<div class="project-grid">
 			{projects.map((project) => (
 				<a class="project-card" href={`/projects/${contentSlug(project.id)}`}>
 					<div class="project-media">{project.data.cover && <Image src={project.data.cover} alt={project.data.coverAlt ?? project.data.title} sizes="(max-width: 800px) 100vw, 33vw" />}</div>
+					<p class="project-context">{project.data.role} · {statusLabel[project.data.projectStatus]}</p>
 					<h2 class="project-title">{project.data.title}</h2>
 					<p class="project-summary">{project.data.summary}</p>
 					<p class="project-meta">{project.data.tech.join(' · ')}</p>

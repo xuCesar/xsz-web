@@ -1,0 +1,58 @@
+---
+interface TocHeading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+
+interface Props {
+	headings: TocHeading[];
+}
+
+const { headings } = Astro.props;
+const visibleHeadings = headings.filter((heading) => heading.depth >= 2 && heading.depth <= 3);
+---
+
+{visibleHeadings.length > 0 && (
+	<aside class="toc-shell">
+		<p class="toc-label">目录</p>
+		<nav class="toc" aria-label="页面目录" data-toc>
+			{visibleHeadings.map((heading) => (
+				<a class={`toc-link toc-depth-${heading.depth}`} href={`#${heading.slug}`} data-toc-link={heading.slug}>
+					{heading.text}
+				</a>
+			))}
+		</nav>
+	</aside>
+)}
+
+<script>
+	const toc = document.querySelector<HTMLElement>('[data-toc]');
+	if (toc) {
+		const links = Array.from(toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+		const headings = links
+			.map((link) => document.getElementById(link.dataset.tocLink ?? ''))
+			.filter((heading): heading is HTMLElement => heading !== null);
+
+		const setActive = (slug: string) => {
+			links.forEach((link) => {
+				const isActive = link.dataset.tocLink === slug;
+				link.classList.toggle('is-active', isActive);
+				if (isActive) link.setAttribute('aria-current', 'location');
+				else link.removeAttribute('aria-current');
+			});
+		};
+
+		setActive(headings[0]?.id ?? '');
+		if ('IntersectionObserver' in window && headings.length > 0) {
+			const observer = new IntersectionObserver(
+				(entries) => {
+					const visible = entries.find((entry) => entry.isIntersecting);
+					if (visible) setActive((visible.target as HTMLElement).id);
+				},
+				{ rootMargin: '-18% 0px -68% 0px', threshold: 0 },
+			);
+			headings.forEach((heading) => observer.observe(heading));
+		}
+	}
+</script>
