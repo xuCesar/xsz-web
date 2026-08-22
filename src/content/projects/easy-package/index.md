@@ -2,14 +2,14 @@
 title: "Easy Package"
 summary: "面向 macOS 开发者的本机环境面板，把软件包、运行时、PATH 和项目依赖放进一套可检查、可追溯的工作流。"
 date: 2026-07-10
-updated: 2026-08-13
+updated: 2026-08-22
 status: published
 featured: true
 tags: [macOS, 开发工具, 本地优先]
 role: "产品设计与全栈开发"
-tech: [Tauri, React, Rust, SQLite]
+tech: [Tauri 2, React, Rust, SQLite]
 projectStatus: active
-repoUrl: https://github.com/xuCesar/easy-package
+repoUrl: "https://github.com/xuCesar/easy-package"
 cover: ./cover.webp
 coverAlt: "Easy Package 本机开发环境概览界面"
 ---
@@ -22,13 +22,15 @@ Easy Package 是一个 macOS 本机开发环境面板。它把原本散落在终
 
 ## 为什么做这个项目
 
-一台长期使用的开发机通常会同时存在 Homebrew、npm、pnpm、Cargo、uv、pip 等管理器。时间久了，同一个命令可能来自不同路径，运行时版本和项目声明也可能不再一致。问题往往不会立刻报错，而是在安装、构建或切换项目时表现成难以定位的环境差异。
+一台长期使用的开发机通常会同时存在 Homebrew、npm、pnpm、Yarn、Bun、Cargo、uv、pip、RubyGems、Composer 等多个管理器。时间久了，同一个命令可能来自不同路径，运行时版本和项目声明也可能不再一致。问题往往不会立刻报错，而是在安装、构建或切换项目时表现成难以定位的环境差异。
 
 Easy Package 试图提供一个比“重新安装一遍”更稳妥的入口：先扫描和解释现状，再决定是否修改。
 
 ## 核心体验
 
 应用启动后不会自动执行修复，而是先建立一份本机快照。概览页集中展示已经发现的管理器、可更新软件包、缓存占用和 PATH 冲突；需要深入时，可以继续查看单个管理器、运行时来源或项目详情。
+
+运行时发现是只读的：应用会识别 Node.js、Python、Rust 的本机安装，以及 nvm、Volta、asdf、mise、pyenv、rustup 等版本管理器来源，并对照项目声明给出匹配结论。
 
 项目工作区是按需添加的。应用只读解析 JavaScript、Python、Rust、Go、Ruby 和 PHP 等生态的 manifest 与锁文件，并检查运行时匹配、重复版本、本地引用和依赖循环。npm、pnpm 与 Cargo 项目还可以构建完整依赖图，或导出 CycloneDX 1.6 SBOM。
 
@@ -45,16 +47,18 @@ Easy Package 试图提供一个比“重新安装一遍”更稳妥的入口：�
 
 ## 本地优先的数据设计
 
-扫描结果、历史快照和审计记录保存在本机 SQLite。应用默认离线，只有用户明确允许 registry 检查后才会访问软件包目录；导出的环境报告会把主目录替换成 `~`，避免把本机绝对路径带到外部文档。
+扫描结果、历史快照和审计记录保存在本机 SQLite。应用默认离线，只有用户明确允许 registry 检查后才会访问软件包目录；锁文件问题检查也完全离线，不查询漏洞库或许可证库。
+
+应用保留最近 10 份扫描快照，任意两份都可以比较新增、变化和移除。导出的环境报告与变化报告支持 JSON 与 Markdown 两种格式，并会把主目录替换成 `~`，避免把本机绝对路径带到外部文档。
 
 ![Easy Package 历史快照对比](./history.webp)
 
 *真实界面：历史页比较两次本机快照，把新增、变化、移除和健康提示分开呈现，并允许导出脱敏后的变化报告。*
 
-前端使用 React 呈现环境与操作状态，Tauri 负责桌面壳和系统能力，Rust 承担扫描、校验与受控写入。这个边界让界面层不直接拼装系统命令，也让核心行为能够独立测试。
+前端使用 React 呈现环境与操作状态，Tauri 2 负责桌面壳和系统能力，Rust 承担扫描、校验与受控写入。这个边界让界面层不直接拼装系统命令，也让核心行为能够独立测试。
 
 ## 当前状态
 
-项目已经发布 `v0.1.0`，可通过 GitHub Releases 下载 macOS DMG。当前版本覆盖环境扫描、软件包管理、项目依赖分析、运行时发现、历史快照和安全操作中心；安装包尚未进行 Apple 签名与公证，因此首次打开仍需要用户在系统设置中确认。
+项目已经发布 `v0.1.0`，可通过 GitHub Releases 下载 macOS DMG，要求 macOS 10.15 及以上。当前版本覆盖环境扫描、软件包管理、项目依赖分析、运行时发现、历史快照和安全操作中心；安装包尚未进行 Apple 签名与公证，因此首次打开仍需要用户在系统设置中确认。发布流程由推送 `v*` 标签触发，经过完整质量门禁后构建 DMG 并生成 draft release，人工确认后才正式发布。
 
 这个项目让我更明确地看到：开发工具的价值不只是“能执行命令”，更在于让执行前后的状态足够清楚，让用户始终知道工具做了什么、没有做什么。
